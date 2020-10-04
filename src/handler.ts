@@ -2,15 +2,15 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import moment from 'moment'
 import dynamodb from 'aws-sdk/clients/dynamodb'
 
-const dd = new dynamodb.DocumentClient({ region: 'eu-west-1' })
+const dd = new dynamodb.DocumentClient({ region: 'us-east-1' })
 
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   const params = {
-    TableName: 'mailgun_logs',
+    TableName: 'mailgun_events',
     Item: {
-      id: 'hello' + moment.utc().toISOString()
+      id: moment.utc().toISOString()
     }
   }
 
