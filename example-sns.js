@@ -8,23 +8,22 @@ exports.handler = function (event, context) {
   var params = {
     Message: eventText,
     Subject: "Test SNS From Lambda",
-    TopicArn: "arn:aws:sns:us-west-2:123456789012:test-topic1",
+    TopicArn: "arn:aws:sns:us-east-1:456389668492:email_events",
   };
   sns.publish(params, context.done);
 };
 
 // =============
 
-// parameters 
+// parameters
 let params = {
-    Message: contentSMS,  // here your sms
-    PhoneNumber: mobile,  // here the cellphone
-  };
- 
- 
-  const snsResult = await sns.publish(params, async (err, data) => {
-     if (err) {
-        console.log("ERROR", err.stack);
-     }
-     console.log('SNS ok: ' , JSON.stringify (data));
-   });
+  Message: contentSMS, // here your sms
+  PhoneNumber: mobile, // here the cellphone
+};
+
+const snsResult = await sns.publish(params, async (err, data) => {
+  if (err) {
+    console.log("ERROR", err.stack);
+  }
+  console.log("SNS ok: ", JSON.stringify(data));
+});
