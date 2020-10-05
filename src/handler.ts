@@ -1,17 +1,16 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import moment from 'moment'
 import { save, publish, verify as verifySignature } from './helpers'
+import { IWebhook } from './models'
 
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
-  const object: any = {
-    id: moment.utc().toISOString(),
-  }
+  const object = JSON.parse(event.body as string) as IWebhook
 
   const dynamodbResponse = await save(object)
 
-  if (!verifySignature(object.signature)) {
+  if (!verifySignature(object.signature,'key-xx')) {
     return {
       statusCode: 401,
       body: JSON.stringify({ msg: 'access denied, bad signature' })

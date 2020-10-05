@@ -4,7 +4,6 @@ export interface IWebhook {
 }
 
 export interface ISignature {
-  signingKey: string
   timestamp: string
   token: string
   signature: string

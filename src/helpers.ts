@@ -7,7 +7,7 @@ import { TOPIC_SUBJECT, TOPIC_ARN, REGION, TABLE_NAME } from './environment'
 export const publish = async (object: IWebhook) => {
   const topic = new sns()
 
-  return await topic
+  return topic
     .publish({
       Message: JSON.stringify(object),
       Subject: TOPIC_SUBJECT,
@@ -16,12 +16,10 @@ export const publish = async (object: IWebhook) => {
     .promise()
 }
 
-export const verify = ({
-  signingKey,
-  timestamp,
-  token,
-  signature
-}: ISignature) => {
+export const verify = (
+  { timestamp, token, signature }: ISignature,
+  signingKey: string
+) => {
   const encodedToken = crypto
     .createHmac('sha256', signingKey)
     .update(timestamp.concat(token))
@@ -33,7 +31,7 @@ export const verify = ({
 export const save = async (object: IWebhook) => {
   const database = new dynamodb.DocumentClient({ region: REGION })
 
-  return await database
+  return database
     .put({
       TableName: TABLE_NAME,
       Item: { id: object['event-data'].id, ...object }
