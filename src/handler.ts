@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import moment from 'moment'
+import { MAILGUN_WEBHOOK_KEY } from './environment'
 import { save, publish, verify as verifySignature } from './helpers'
 import { IWebhook } from './models'
 
@@ -10,7 +10,7 @@ export const handler = async (
 
   const dynamodbResponse = await save(object)
 
-  if (!verifySignature(object.signature,'key-xx')) {
+  if (!verifySignature(object.signature,MAILGUN_WEBHOOK_KEY)) {
     return {
       statusCode: 401,
       body: JSON.stringify({ msg: 'access denied, bad signature' })
