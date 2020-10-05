@@ -7,7 +7,7 @@ import { TOPIC_SUBJECT, TOPIC_ARN, REGION, TABLE_NAME } from './environment'
 export const publish = async (object: IWebhook) => {
   const topic = new sns()
 
-  return await topic
+  return topic
     .publish({
       Message: JSON.stringify(object),
       Subject: TOPIC_SUBJECT,

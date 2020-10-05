@@ -1,13 +1,171 @@
 import { handler } from '../src/handler'
+import * as helpers from  '../src/helpers'
 import { expect } from 'chai'
 import * as sinon from 'sinon'
 import 'mocha'
 import moment from 'moment'
+import { verify, verifyAndRestore } from 'sinon'
 
 describe('handler', () => {
+  const body = {
+    "event-data": {
+        "campaigns": {
+            "L": []
+        },
+        "delivery-status": {
+            "M": {
+                "attempt-no": {
+                    "N": "1"
+                },
+                "certificate-verified": {
+                    "BOOL": true
+                },
+                "code": {
+                    "N": "250"
+                },
+                "description": {
+                    "S": ""
+                },
+                "message": {
+                    "S": "OK"
+                },
+                "mx-host": {
+                    "S": "smtp-in.example.com"
+                },
+                "session-seconds": {
+                    "N": "0.4331989288330078"
+                },
+                "tls": {
+                    "BOOL": true
+                },
+                "utf8": {
+                    "BOOL": true
+                }
+            }
+        },
+        "envelope": {
+            "M": {
+                "sender": {
+                    "S": "bob@mail.graphselfie.com"
+                },
+                "sending-ip": {
+                    "S": "209.61.154.250"
+                },
+                "targets": {
+                    "S": "alice@example.com"
+                },
+                "transport": {
+                    "S": "smtp"
+                }
+            }
+        },
+        "event": {
+            "S": "delivered"
+        },
+        "flags": {
+            "M": {
+                "is-authenticated": {
+                    "BOOL": true
+                },
+                "is-routed": {
+                    "BOOL": false
+                },
+                "is-system-test": {
+                    "BOOL": false
+                },
+                "is-test-mode": {
+                    "BOOL": false
+                }
+            }
+        },
+        "id": {
+            "S": "CPgfbmQMTCKtHW6uIWtuVe"
+        },
+        "log-level": {
+            "S": "info"
+        },
+        "message": {
+            "M": {
+                "attachments": {
+                    "L": []
+                },
+                "headers": {
+                    "M": {
+                        "from": {
+                            "S": "Bob <bob@mail.graphselfie.com>"
+                        },
+                        "message-id": {
+                            "S": "20130503182626.18666.16540@mail.graphselfie.com"
+                        },
+                        "subject": {
+                            "S": "Test delivered webhook"
+                        },
+                        "to": {
+                            "S": "Alice <alice@example.com>"
+                        }
+                    }
+                },
+                "size": {
+                    "N": "111"
+                }
+            }
+        },
+        "recipient": {
+            "S": "alice@example.com"
+        },
+        "recipient-domain": {
+            "S": "example.com"
+        },
+        "storage": {
+            "M": {
+                "key": {
+                    "S": "message_key"
+                },
+                "url": {
+                    "S": "https://se.api.mailgun.net/v3/domains/mail.graphselfie.com/messages/message_key"
+                }
+            }
+        },
+        "tags": {
+            "L": [
+                {
+                    "S": "my_tag_1"
+                },
+                {
+                    "S": "my_tag_2"
+                }
+            ]
+        },
+        "timestamp": {
+            "N": "1521472262.908181"
+        },
+        "user-variables": {
+            "M": {
+                "my-var-2": {
+                    "S": "awesome"
+                },
+                "my_var_1": {
+                    "S": "Mailgun Variable #1"
+                }
+            }
+        }
+    },
+    "signature": {
+        "signature": {
+            "S": "bed08444d3d6aa1961a12738c7a39f624de889dd639700e6972120947a6f95ac"
+        },
+        "timestamp": {
+            "S": "1601891220"
+        },
+        "token": {
+            "S": "9ce8bba0e03a00c96d617553ccf5fb5b1a4d362a0698b7a842"
+        }
+    }
+}
+  
   const dummyEvent = {
     headers: {},
-    body: null,
+    body:JSON.stringify(body),
     multiValueHeaders: {},
     httpMethod: 'GET',
     isBase64Encoded: false,
@@ -46,17 +204,37 @@ describe('handler', () => {
     resource: ''
   }
 
-  before(function () {
+  beforeEach(function () {
     this.clock = sinon.useFakeTimers(new Date(2012, 1, 10).getTime())
+    const save = sinon.stub(helpers,'save').returns({$response:{data:JSON.stringify(body),error:false}} as any)
+    const publish = sinon.stub(helpers, 'publish').returns({$response:{error:false}} as any);
+
   })
 
-  after(function () {
+  afterEach(function () {
     this.clock.restore()
+    sinon.restore()
   })
 
   it('should return 200 always!', async () => {
-    // const result = await handler(dummyEvent)
-    // expect(result).to.be.deep.equal({statusCode: 200, body: moment().utc().toISOString()})
+
+    const verify = sinon.stub(helpers,'verify').returns(true)
+
+
+    const result = await handler(dummyEvent)
+    const resultBody = JSON.parse(JSON.parse(result.body))
+    expect(result).to.be.deep.include({statusCode: 200})
+    expect(resultBody['event-data']).to.be.deep.equal(body['event-data'])
+
   })
 
+  
+
+  it('should return 401', async () => {
+    
+    const verify = sinon.stub(helpers,'verify').returns(false)
+    const result = await handler(dummyEvent)
+    expect(result).to.be.deep.include({statusCode: 401})
+
+  })
 })
