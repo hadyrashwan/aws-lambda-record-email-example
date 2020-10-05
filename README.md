@@ -1,7 +1,11 @@
-# What is this?
+# AWS-lambda-record-email-example
+This function connects with Mailgun webhook API. Checks the signature the add the body to dynmodb finally publish it to sns.
 
-Here you can find template for AWS Lambda written in TS.
 
+## Setup
+Overwrite the parameters in `src/environment.ts`.
+
+## Build
 To build project you need to type:
 `npm run all`
 Build process consists of:
@@ -10,6 +14,8 @@ Build process consists of:
   - generating js files (tsc) 
   - trimming node_modules to production only
   - creating zip file with lambda code and dependencies (zip is stored in dist directory)
+
+
   
 When you have zip file, you can create your lambda function. It can be done by AWS Web Console.
 Navigate to lambda functions, then click `Create Function`, pickup name for you function, and click `Create`.
@@ -21,6 +27,11 @@ AWS should redirect you to lambda configuration page. Now to deploy your lambda 
  - change handler to `dist/handler.handler`
  
  That's all :) now you can enjoy playing with lambda written in TypeScript
+
+ ## Todo
+- Use [AWS environment variables](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html).
+- Split the function into  2 functions(http trigger and dynmodb trigger).
+
  
 # There is another way to do that!
 As you can see this project contains Jenkinsfile so you can easily build and deploy this lambda automatically!
@@ -38,3 +49,6 @@ What needs to be done:
 To clean up AWS resources you need to navigate AWS Console / cloudformation and delete two stacks `<env>-ts-lambda` and `<env>-deployment-bucket`. 
 S3 Bucket [will not be deleted automatically](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-deletionpolicy.html) so you need to remove it manual :(  
 
+
+## Credit
+This template is made by [Mslosarz](https://github.com/mslosarz/). You can learn more from here [aws-lambda-typescript](https://github.com/mslosarz/aws-lambda-typescript).
