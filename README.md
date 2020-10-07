@@ -2,8 +2,6 @@
 This function connects with Mailgun webhook API. Checks the signature the add the body to dynmodb finally publish it to sns.
 
 
-## Setup
-Overwrite the parameters in `src/environment.ts`.
 
 ## Build
 To build project you need to type:
@@ -28,8 +26,11 @@ AWS should redirect you to lambda configuration page. Now to deploy your lambda 
  
  That's all :) now you can enjoy playing with lambda written in TypeScript
 
+ ## Setup
+- Add environment variables using [AWS environment variables](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html). The environment variables needed are listed in `src/environment.ts`
+
  ## Todo
-- Use [AWS environment variables](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html).
+- Add more test cases.
 - Split the function into  2 functions(http trigger and dynmodb trigger).
 
  
