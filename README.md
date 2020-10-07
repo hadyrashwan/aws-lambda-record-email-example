@@ -1,5 +1,5 @@
 # AWS-lambda-record-email-example
-This function connects with Mailgun webhook API. Checks the signature the add the body to dynmodb finally publish it to sns.
+This function connects with Mailgun webhook API. Checks the signature then add the body to dynmodb finally publish it to sns.
 
 
 
