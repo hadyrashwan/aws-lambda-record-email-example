@@ -30,8 +30,7 @@ AWS should redirect you to lambda configuration page. Now to deploy your lambda 
 - Add environment variables using [AWS environment variables](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html). The environment variables needed are listed in `src/environment.ts`
 
  ## Todo
-- Add more test cases.
-- Split the function into  2 functions(http trigger and dynmodb trigger).
+- Split the function into  2 functions(Http trigger and Dynamodb trigger).
 
  
 # There is another way to do that!

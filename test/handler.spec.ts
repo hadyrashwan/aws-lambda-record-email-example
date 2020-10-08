@@ -204,37 +204,64 @@ describe('handler', () => {
     resource: ''
   }
 
-  beforeEach(function () {
-    this.clock = sinon.useFakeTimers(new Date(2012, 1, 10).getTime())
-    const save = sinon.stub(helpers,'save').returns({$response:{data:JSON.stringify(body),error:false}} as any)
-    const publish = sinon.stub(helpers, 'publish').returns({$response:{error:false}} as any);
 
-  })
 
   afterEach(function () {
-    this.clock.restore()
     sinon.restore()
   })
 
-  it('should return 200 always!', async () => {
-
-    const verify = sinon.stub(helpers,'verify').returns(true)
-
-
-    const result = await handler(dummyEvent)
-    const resultBody = JSON.parse(JSON.parse(result.body))
-    expect(result).to.be.deep.include({statusCode: 200})
-    expect(resultBody['event-data']).to.be.deep.equal(body['event-data'])
-
-  })
-
-  
-
-  it('should return 401', async () => {
+  it('should return 401 for Mailgun corrupted signature ', async () => {
     
     const verify = sinon.stub(helpers,'verify').returns(false)
     const result = await handler(dummyEvent)
-    expect(result).to.be.deep.include({statusCode: 401})
-
+    expect(result).to.be.include({statusCode: 401})
+  
   })
+  
+  
+  
+  it('should return 500 for Dynamodb failure!', async () => {
+      
+      const verify = sinon.stub(helpers,'verify').returns(true)
+      
+      const save = sinon.stub(helpers,'save').returns({$response:{data:JSON.stringify(body),error: {isError:true}}} as any)
+      
+      
+      
+      const result = await handler(dummyEvent)
+      expect(result).to.include({statusCode: 500})
+      
+    })
+    
+    it('should return 500 for SNS failure!', async () => {
+        
+        const verify = sinon.stub(helpers,'verify').returns(true)
+        const save = sinon.stub(helpers,'save').returns({$response:{data:JSON.stringify(body),error:false}} as any)
+        
+        const publish = sinon.stub(helpers, 'publish').returns({$response:{error: {isError:true}}} as any);
+        
+        
+        
+        const result = await handler(dummyEvent)
+        expect(result).to.include({statusCode: 500})
+        
+    })
+    
+    it('should return 200 always!', async () => {
+  
+      const verify = sinon.stub(helpers,'verify').returns(true)
+      const save = sinon.stub(helpers,'save').returns({$response:{data:JSON.stringify(body),error:false}} as any)
+      const publish = sinon.stub(helpers, 'publish').returns({$response:{error:false}} as any);
+  
+  
+  
+      const result = await handler(dummyEvent)
+      const resultBody = JSON.parse(JSON.parse(result.body))
+      expect(result).to.include({statusCode: 200})
+      expect(resultBody['event-data']).to.be.deep.equal(body['event-data'])
+  
+    })
+
+  
+
 })

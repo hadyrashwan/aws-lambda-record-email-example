@@ -7,15 +7,14 @@ export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   const object = JSON.parse(event.body as string) as IWebhook
-
-  const dynamodbResponse = await save(object)
-
   if (!verifySignature(object.signature,MAILGUN_WEBHOOK_KEY)) {
     return {
       statusCode: 401,
       body: JSON.stringify({ msg: 'access denied, bad signature' })
     }
   }
+
+  const dynamodbResponse = await save(object)
 
   if (dynamodbResponse.$response.error) {
     return {
